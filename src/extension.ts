@@ -64,7 +64,7 @@ function login(context: vscode.ExtensionContext) {
 		const monday = mondaySdk();
 		console.log('OAuth Begins'); 
 
-		http.createServer(async (req, res) => {
+		var server = http.createServer(async (req, res) => {
 			res.writeHead(200, { 'Content-Type': 'text/html' }); // http header
 			const { url, method } = req;
 			if (method === 'GET' && url?.includes('/oauth/callback')) {
@@ -79,12 +79,9 @@ function login(context: vscode.ExtensionContext) {
 					client_secret: clientsecret,
 				};
 				const response = await axios.post('https://auth.monday.com/oauth2/token', body);
-				console.log(response);
-				//const token = response.data.access_token;
-				//const accessInfo = await this.acquireToken(params.code as string);
-				//this.handleAcquiredToken(accessInfo);
-				//resolve();
-				//this.shutdownRedirectServer(timeout);
+				const token = response.data.access_token;
+				console.log(token);
+				server.close();
 			}
 		})
 		.listen(3000, () => {
