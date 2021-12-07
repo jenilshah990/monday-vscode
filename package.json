@@ -23,27 +23,33 @@
     "commands": [
       {
         "command": "monday-vscode.helloWorld",
-        "title": "Hello World"
+        "title": "Hello World",
+        "category": "Monday"
       },
       {
         "command": "monday-vscode.showTime",
-        "title": "Show Time"
+        "title": "Show Time", 
+        "category": "Monday"
       },
       {
         "command": "monday-vscode.login",
-        "title": "Login"
+        "title": "Login", 
+        "category": "Monday"
       },
       {
         "command": "monday-vscode.showBoards",
-        "title": "Show Boards"
+        "title": "Show Boards", 
+        "category": "Monday"
       },
       {
         "command": "monday-vscode.commentItems",
-        "title": "See Items"
+        "title": "See Items", 
+        "category": "Monday"
       },
       {
         "command": "monday-vscode.completeItem",
-        "title": "Modify Item"
+        "title": "Modify Item", 
+        "category": "Monday"
       }
     ]
   },

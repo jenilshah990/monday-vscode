@@ -109,12 +109,14 @@ function modifyItemStatus(context: vscode.ExtensionContext) {
 		console.log(response);
 		});*/
 	});
+	context.subscriptions.push(disposableCompleteItem); 
 }
 
 function commentItems(context: vscode.ExtensionContext){
 	let disposableItems = vscode.commands.registerCommand('monday-vscode.commentItems', async () => {
 		
 	});
+	context.subscriptions.push(disposableItems); 
 }
 
 function showDate(context: vscode.ExtensionContext) {	
@@ -139,13 +141,16 @@ function showBoards(context: vscode.ExtensionContext) {
 		const selectedBoard = boards.find( (board: any) => board.name === selectedBoardName).id;
 		//add boardSelection to context
 		context.workspaceState.update('boardSelection', selectedBoard);
-		const items = await monday.api(itemsQuery(selectedBoard));
-		//add to context
-		context.workspaceState.update('items', items.data.boards[0].items);
+		getItemsMonday(context, selectedBoard); 
 	});
 	context.subscriptions.push(disposableBoards);
 }
 
+async function getItemsMonday(context: vscode.ExtensionContext, selectedBoard: any) {
+	const items = await monday.api(itemsQuery(selectedBoard));
+	//add to context
+	context.workspaceState.update('items', items.data.boards[0].items);
+}
 
 function login(context: vscode.ExtensionContext) {
 	const clientid = 'fe08982fe04e8bc054cb0798041afee9'; // Your app's client ID
