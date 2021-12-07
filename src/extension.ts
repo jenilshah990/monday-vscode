@@ -19,11 +19,27 @@ const finishedRequestHTML =
 	</body> \
 	</html>'
 
+const allBoardsQuery = `{ boards {
+	name
+	id
+	description
+	items {
+	  name
+	  column_values {
+		title
+		id
+		type
+		text
+  } } } }`;
+
 // this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
+// your extension is activated the very first time the command is executed\
+
+//global sdk - not sure if this will work
+const monday = mondaySdk();
+
 export function activate(context: vscode.ExtensionContext) {
 	//sdk
-	const monday = mondaySdk();
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
@@ -33,7 +49,8 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 	context.subscriptions.push(disposable);
 	showDate(context); 
-	login(context, monday); 
+	login(context); 
+	showBoards(context);
 
 }
 
@@ -46,7 +63,20 @@ function showDate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposableDateTime);
 }
 
-function login(context: vscode.ExtensionContext, monday: any) {
+function showBoards(context: vscode.ExtensionContext) {
+	console.log('Showing Boards!');
+	let disposableBoards = vscode.commands.registerCommand('monday-vscode.showBoards', async () => {
+		//get boards
+		const response = await monday.api(allBoardsQuery);
+		const boards = response.data.boards;
+		//show boards
+		vscode.window.showInformationMessage(boards.map( (board: any) => board.name).join('\n'));
+	});
+	context.subscriptions.push(disposableBoards);
+}
+
+
+function login(context: vscode.ExtensionContext) {
 	const clientid = 'fe08982fe04e8bc054cb0798041afee9'; // Your app's client ID
 	const clientsecret = '40f84910b477006d7e6a7935e7ca4736'; // Your app's secret
 	const redirecturi = 'http://localhost:3000/oauth/callback'; // The URI you will send your user to after auth
@@ -58,7 +88,7 @@ function login(context: vscode.ExtensionContext, monday: any) {
 			scopes: scopes
 		}).toString();
 	console.log("Logging into Monday.com"); 
-	let login = vscode.commands.registerCommand('monday-vscode.login', async (monday) => {
+	let login = vscode.commands.registerCommand('monday-vscode.login', async () => {
 		console.log('OAuth Begins'); 
 
 		var server = http.createServer(async (req, res) => {

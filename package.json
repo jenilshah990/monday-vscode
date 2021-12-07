@@ -12,7 +12,8 @@
   "activationEvents": [
     "onCommand:monday-vscode.helloWorld",
     "onCommand:monday-vscode.showTime",
-    "onCommand:monday-vscode.login"
+    "onCommand:monday-vscode.login",
+    "onCommand:monday-vscode.showBoards"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -28,6 +29,10 @@
       {
         "command": "monday-vscode.login",
         "title": "Login"
+      },
+      {
+        "command": "monday-vscode.showBoards",
+        "title": "Show Boards"
       }
     ]
   },
