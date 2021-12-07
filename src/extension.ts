@@ -32,13 +32,28 @@ const allBoardsQuery = `{ boards {
 		text
   } } } }`;
 
+function itemsQuery(boardid: string){
+	return `query {
+		boards (ids: ${boardid}) {
+		  items {
+			id
+			name
+			column_values {
+			  id
+			  title
+			  value
+			}
+		  }
+		} }`;
+}
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed\
 
 //global sdk - not sure if this will work
 const monday = mondaySdk();
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
 	//sdk
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
@@ -51,6 +66,55 @@ export function activate(context: vscode.ExtensionContext) {
 	showDate(context); 
 	login(context); 
 	showBoards(context);
+	commentItems(context);
+	modifyItemStatus(context);
+	//execute login, showBoards, commentItems?
+}
+
+function modifyItemStatus(context: vscode.ExtensionContext) {
+	let disposableCompleteItem = vscode.commands.registerCommand('monday-vscode.completeItem', async () => {
+		const boardSelection = context.workspaceState.get('boardSelection') as string;
+		//get items from context
+		const items = context.workspaceState.get('items') as any[];
+		console.log(items);
+		//get item names
+		const itemNames = items.map( (item: any) => item.name);
+		//show quickpick
+		const selectedItem = await vscode.window.showQuickPick(itemNames);
+		//get selectedItemId
+		const selectedItemId = items.find( (item: any) => item.name === selectedItem).id;
+		//complete selectedItem
+		/*const response = await monday.api(`mutation change_column($value: JSON!) {
+
+			change_column_value(board_id: ${boardSelection}, item_id: ${selectedItemId}, column_id: "status", value: "done") {
+				 id
+			}
+	   
+	   }`);*/
+	   const possibleStatus = ["Done", "Working on it", "Ready for review", "On hold", "Stuck", "Planned", "Up next", "Future steps"];
+	 	//quickpick
+	   const selectedStatus = await vscode.window.showQuickPick(possibleStatus) as string;
+	   console.log(selectedStatus);
+	   const status = "Done";
+	   const query = `mutation changeValues($value: JSON!) {
+        change_column_value (board_id: ${boardSelection}, item_id: ${selectedItemId} , column_id: status, value: $value) {
+          id
+        } 
+      }`;
+	  const response = await monday.api(query, {variables: {"value": "{\"label\":\""+selectedStatus+"\"}"}});
+	   console.log(response);
+		  /*const response = await monday.api(`mutation{
+		   change_column_value(item_id:${selectedItemId}, board_id:${boardSelection}, 
+			column_id:"status", value:\"{\\\"label\\\" : \\\"Done\\\"}\"){id}}`);
+		console.log(response);
+		});*/
+	});
+}
+
+function commentItems(context: vscode.ExtensionContext){
+	let disposableItems = vscode.commands.registerCommand('monday-vscode.commentItems', async () => {
+		
+	});
 }
 
 function showDate(context: vscode.ExtensionContext) {	
@@ -70,11 +134,14 @@ function showBoards(context: vscode.ExtensionContext) {
 		const boards = response.data.boards;
 		const boardNames = boards.map( (board: any) => board.name);
 		//show quickpick
-		const boardSelection = await vscode.window.showQuickPick(boardNames);
-		console.log(boardSelection);
+		const selectedBoardName = await vscode.window.showQuickPick(boardNames);
+		//get id of selectedBoardName
+		const selectedBoard = boards.find( (board: any) => board.name === selectedBoardName).id;
 		//add boardSelection to context
-		context.workspaceState.update('boardSelection', boardSelection);
-		
+		context.workspaceState.update('boardSelection', selectedBoard);
+		const items = await monday.api(itemsQuery(selectedBoard));
+		//add to context
+		context.workspaceState.update('items', items.data.boards[0].items);
 	});
 	context.subscriptions.push(disposableBoards);
 }

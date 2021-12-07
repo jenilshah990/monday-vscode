@@ -10,10 +10,13 @@
     "Other"
   ],
   "activationEvents": [
+    "*",
     "onCommand:monday-vscode.helloWorld",
     "onCommand:monday-vscode.showTime",
     "onCommand:monday-vscode.login",
-    "onCommand:monday-vscode.showBoards"
+    "onCommand:monday-vscode.showBoards",
+    "onCommand:monday-vscode.commentItems",
+    "onCommand:monday-vscode.completeItem"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -33,6 +36,14 @@
       {
         "command": "monday-vscode.showBoards",
         "title": "Show Boards"
+      },
+      {
+        "command": "monday-vscode.commentItems",
+        "title": "See Items"
+      },
+      {
+        "command": "monday-vscode.completeItem",
+        "title": "Modify Item"
       }
     ]
   },
