@@ -51,7 +51,6 @@ export function activate(context: vscode.ExtensionContext) {
 	showDate(context); 
 	login(context); 
 	showBoards(context);
-
 }
 
 function showDate(context: vscode.ExtensionContext) {	
@@ -69,8 +68,13 @@ function showBoards(context: vscode.ExtensionContext) {
 		//get boards
 		const response = await monday.api(allBoardsQuery);
 		const boards = response.data.boards;
-		//show boards
-		vscode.window.showInformationMessage(boards.map( (board: any) => board.name).join('\n'));
+		const boardNames = boards.map( (board: any) => board.name);
+		//show quickpick
+		const boardSelection = await vscode.window.showQuickPick(boardNames);
+		console.log(boardSelection);
+		//add boardSelection to context
+		context.workspaceState.update('boardSelection', boardSelection);
+		
 	});
 	context.subscriptions.push(disposableBoards);
 }
