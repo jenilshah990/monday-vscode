@@ -38,6 +38,11 @@
         "category": "Monday"
       },
       {
+        "command": "monday-vscode.logout",
+        "title": "Logout", 
+        "category": "Monday"
+      },
+      {
         "command": "monday-vscode.showBoards",
         "title": "Show Boards", 
         "category": "Monday"

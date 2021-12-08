@@ -73,7 +73,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	const session = new SessionManager(); 
 	session.init(context); 
 	login(context, session);
-	
+	logout(context, session); 
 	//execute login, showBoards, commentItems?
 }
 
@@ -163,6 +163,14 @@ function commentItems(context: vscode.ExtensionContext){
 	context.subscriptions.push(disposableItems); 
 }
 
+function logout(context: vscode.ExtensionContext, SessionManager: SessionManager) {
+	let disposableLogout = vscode.commands.registerCommand('monday-vscode.logout', () => {
+		SessionManager.logout(context); 
+		vscode.window.showInformationMessage('Successfully logged out');
+	});
+	context.subscriptions.push(disposableLogout); 
+}
+
 function showDate(context: vscode.ExtensionContext) {	
 	console.log('Showing Date!');
 	let disposableDateTime = vscode.commands.registerCommand('monday-vscode.showTime', () => {
@@ -236,6 +244,7 @@ function login(context: vscode.ExtensionContext, SessionManager: SessionManager)
 				if(response.status == 200) {
 					vscode.window.showInformationMessage('Authentication Successful');
 					console.log(response); 
+					monday.setToken(response.data.access_token);
 					updateSession(response.data as session, context,SessionManager);
 				} else {
 					vscode.window.showInformationMessage("Authetication Failed. Please retry");
@@ -253,7 +262,7 @@ function login(context: vscode.ExtensionContext, SessionManager: SessionManager)
 }
 
 function updateSession(acquiredSession: session, context: vscode.ExtensionContext, SessionManager: SessionManager) {
-	monday.setToken(acquiredSession.accessToken);  
+	monday.setToken(acquiredSession.access_token);  
 	const currSession = SessionManager.getSession(context);
 	console.log('Current Session', currSession); 
 	let newSession = { ...currSession, ...acquiredSession}; 
