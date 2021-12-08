@@ -5,6 +5,8 @@ import mondaySdk from 'monday-sdk-js';
 import * as http from 'http';
 import axios from 'axios';
 import { parse } from 'url';
+import { session } from './SessionManager';
+import { SessionManager } from './SessionManager';
 
 const finishedRequestHTML = 
 	'<!DOCTYPE html> \
@@ -64,11 +66,14 @@ export async function activate(context: vscode.ExtensionContext) {
 	});
 	context.subscriptions.push(disposable);
 	showDate(context); 
-	login(context); 
 	showBoards(context);
 	commentItems(context);
 	modifyItemStatus(context);
 	createItem(context);
+	const session = new SessionManager(); 
+	session.init(context); 
+	login(context, session);
+	
 	//execute login, showBoards, commentItems?
 }
 
@@ -191,7 +196,7 @@ async function getItemsMonday(context: vscode.ExtensionContext, selectedBoard: a
 	context.workspaceState.update('items', items.data.boards[0].items);
 }
 
-function login(context: vscode.ExtensionContext) {
+function login(context: vscode.ExtensionContext, SessionManager: SessionManager) {
 	const clientid = 'fe08982fe04e8bc054cb0798041afee9'; // Your app's client ID
 	const clientsecret = '40f84910b477006d7e6a7935e7ca4736'; // Your app's secret
 	const redirecturi = 'http://localhost:3000/oauth/callback'; // The URI you will send your user to after auth
@@ -203,10 +208,17 @@ function login(context: vscode.ExtensionContext) {
 			scopes: scopes
 		}).toString();
 	console.log("Logging into Monday.com"); 
+	console.log(SessionManager.getSession(context));
 	let login = vscode.commands.registerCommand('monday-vscode.login', async () => {
-		console.log('OAuth Begins'); 
+
+		if(SessionManager.isAuthenticated(context)) {
+			console.log('User already authenticated'); 
+			vscode.window.showInformationMessage('User Logged In!');
+			return; 
+		}
 
 		var server = http.createServer(async (req, res) => {
+			console.log('OAuth Begins'); 
 			res.writeHead(200, { 'Content-Type': 'text/html' }); // http header
 			const { url, method } = req;
 			if (method === 'GET' && url?.includes('/oauth/callback')) {
@@ -221,8 +233,13 @@ function login(context: vscode.ExtensionContext) {
 					client_secret: clientsecret,
 				};
 				const response = await axios.post('https://auth.monday.com/oauth2/token', body);
-				const token = response.data.access_token;
-				monday.setToken(token);
+				if(response.status == 200) {
+					vscode.window.showInformationMessage('Authentication Successful');
+					console.log(response); 
+					updateSession(response.data as session, context,SessionManager);
+				} else {
+					vscode.window.showInformationMessage("Authetication Failed. Please retry");
+				}
 				server.close();
 			}
 		})
@@ -233,6 +250,15 @@ function login(context: vscode.ExtensionContext) {
 		console.log('OAuth Completed'); 	 
 	});
 	context.subscriptions.push(login);  
+}
+
+function updateSession(acquiredSession: session, context: vscode.ExtensionContext, SessionManager: SessionManager) {
+	monday.setToken(acquiredSession.accessToken);  
+	const currSession = SessionManager.getSession(context);
+	console.log('Current Session', currSession); 
+	let newSession = { ...currSession, ...acquiredSession}; 
+	SessionManager.setSession(context, newSession); 
+	console.log('New Session Started:', newSession); 
 }
 
 // this method is called when your extension is deactivated
