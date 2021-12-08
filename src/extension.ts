@@ -78,28 +78,28 @@ function createItem(context: vscode.ExtensionContext) {
 
 		/*
 		was tring to make it so that you can create a new item in a specific group, but apparently groups
-		don't have names???
+		don't have names???*/
 		const group_query = `{
 			boards(ids: ${boardSelection}) {
 			id
 			groups {
 			id
-			name
+			title
 			items {
 			id
 			name
 		}}}}`;
 		const groups = await monday.api(group_query);
 		console.log(groups);
-		const groupNames = groups.data.boards[0].groups.map( (group: any) => group.name);
+		const groupNames = groups.data.boards[0].groups.map( (group: any) => group.title);
 		const selectedGroup = await vscode.window.showQuickPick(groupNames);
-		const selectedGroupId = groups.data.boards[0].groups.find( (group: any) => group.name === selectedGroup).id;
-		*/
+		const selectedGroupId = groups.data.boards[0].groups.find( (group: any) => group.title === selectedGroup).id;
+		
 
 		const itemName = await vscode.window.showInputBox();
 		const query = `mutation createItem($value: JSON!) {
 			create_item(board_id: ${boardSelection}, item_name: ${itemName}, 
-				 column_values: $value) {
+				 column_values: $value, group_id: ${selectedGroupId}) {
 				id
 			}
 		}`;
