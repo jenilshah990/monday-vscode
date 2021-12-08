@@ -71,7 +71,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	modifyItemStatus(context);
 	createItem(context);
 	const session = new SessionManager(); 
-	session.init(context); 
+	session.init(context, monday); 
 	login(context, session);
 	logout(context, session); 
 	//execute login, showBoards, commentItems?
@@ -116,6 +116,7 @@ function createItem(context: vscode.ExtensionContext) {
 }
 
 function modifyItemStatus(context: vscode.ExtensionContext) {
+	console.log('Modifying Item'); 
 	let disposableCompleteItem = vscode.commands.registerCommand('monday-vscode.completeItem', async () => {
 		const boardSelection = context.workspaceState.get('boardSelection') as string;
 		//get items from context

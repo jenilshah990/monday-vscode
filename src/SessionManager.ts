@@ -17,8 +17,8 @@ export class SessionManager {
     redirectURL: http.Server | undefined;
     monday: any; 
     context: any; 
-    async init(context: vscode.ExtensionContext) {
-       this.monday = mondaySdk();  
+    async init(context: vscode.ExtensionContext, monday: any) {
+       this.monday = monday;  
        const currentSession = this.getSession(context);  
        if(!currentSession || !currentSession.access_token || this.isExpired(currentSession.access_token_expiration_date)) {
            this.setSession(context, undefined); 
