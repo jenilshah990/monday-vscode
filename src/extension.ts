@@ -68,7 +68,46 @@ export async function activate(context: vscode.ExtensionContext) {
 	showBoards(context);
 	commentItems(context);
 	modifyItemStatus(context);
+	createItem(context);
 	//execute login, showBoards, commentItems?
+}
+
+function createItem(context: vscode.ExtensionContext) {
+	let disposableCreateItem = vscode.commands.registerCommand('monday-vscode.createItem', async () => {
+		const boardSelection = context.workspaceState.get('boardSelection') as string;
+
+		/*
+		was tring to make it so that you can create a new item in a specific group, but apparently groups
+		don't have names???
+		const group_query = `{
+			boards(ids: ${boardSelection}) {
+			id
+			groups {
+			id
+			name
+			items {
+			id
+			name
+		}}}}`;
+		const groups = await monday.api(group_query);
+		console.log(groups);
+		const groupNames = groups.data.boards[0].groups.map( (group: any) => group.name);
+		const selectedGroup = await vscode.window.showQuickPick(groupNames);
+		const selectedGroupId = groups.data.boards[0].groups.find( (group: any) => group.name === selectedGroup).id;
+		*/
+
+		const itemName = await vscode.window.showInputBox();
+		const query = `mutation createItem($value: JSON!) {
+			create_item(board_id: ${boardSelection}, item_name: ${itemName}, 
+				 column_values: $value) {
+				id
+			}
+		}`;
+		const response = await monday.api(query, {variables: {"value": "{\"label\":\"Working on it\", \
+																		\"priority\":\"High\"}"}});
+		console.log(response);
+	});
+	context.subscriptions.push(disposableCreateItem);
 }
 
 function modifyItemStatus(context: vscode.ExtensionContext) {

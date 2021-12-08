@@ -16,7 +16,8 @@
     "onCommand:monday-vscode.login",
     "onCommand:monday-vscode.showBoards",
     "onCommand:monday-vscode.commentItems",
-    "onCommand:monday-vscode.completeItem"
+    "onCommand:monday-vscode.completeItem",
+    "onCommand:monday-vscode.createItem"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -49,6 +50,11 @@
       {
         "command": "monday-vscode.completeItem",
         "title": "Modify Item", 
+        "category": "Monday"
+      },
+      {
+        "command": "monday-vscode.createItem",
+        "title": "Create Item",
         "category": "Monday"
       }
     ]
