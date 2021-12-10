@@ -127,6 +127,7 @@ function modifyItemStatus(context: vscode.ExtensionContext) {
 	let disposableCompleteItem = vscode.commands.registerCommand('monday-vscode.completeItem', async () => {
 		const boardSelection = context.workspaceState.get('boardSelection') as string;
 		//get items from context
+		await getItemsMonday(context, boardSelection); 
 		const items = context.workspaceState.get('items') as any[];
 		console.log(items);
 		//get item names
