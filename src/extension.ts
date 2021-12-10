@@ -110,6 +110,13 @@ function createItem(context: vscode.ExtensionContext) {
 		}`;
 		const response = await monday.api(query, {variables: {"value": "{\"label\":\"Working on it\", \
 																		\"priority\":\"High\"}"}});
+		
+		if(response.data != null) {
+			vscode.window.showInformationMessage('Successfully created item');
+			console.log(response); 
+		} else {
+			vscode.window.showInformationMessage("Error creating item");
+		}
 		console.log(response);
 	});
 	context.subscriptions.push(disposableCreateItem);
@@ -147,7 +154,13 @@ function modifyItemStatus(context: vscode.ExtensionContext) {
         } 
       }`;
 	  const response = await monday.api(query, {variables: {"value": "{\"label\":\""+selectedStatus+"\"}"}});
-	   console.log(response);
+
+	   if(response.data != null) {
+		vscode.window.showInformationMessage('Successfully updated item status');
+		console.log(response); 
+		} else {
+			vscode.window.showInformationMessage("Error updating item status");
+		}
 		  /*const response = await monday.api(`mutation{
 		   change_column_value(item_id:${selectedItemId}, board_id:${boardSelection}, 
 			column_id:"status", value:\"{\\\"label\\\" : \\\"Done\\\"}\"){id}}`);
@@ -186,15 +199,23 @@ function showBoards(context: vscode.ExtensionContext) {
 	let disposableBoards = vscode.commands.registerCommand('monday-vscode.showBoards', async () => {
 		//get boards
 		const response = await monday.api(allBoardsQuery);
-		const boards = response.data.boards;
-		const boardNames = boards.map( (board: any) => board.name);
-		//show quickpick
-		const selectedBoardName = await vscode.window.showQuickPick(boardNames);
-		//get id of selectedBoardName
-		const selectedBoard = boards.find( (board: any) => board.name === selectedBoardName).id;
-		//add boardSelection to context
-		context.workspaceState.update('boardSelection', selectedBoard);
-		getItemsMonday(context, selectedBoard); 
+		console.log(response);
+		if(response.data != null) {
+			vscode.window.showInformationMessage('Successfully retrieved boards');
+			console.log(response); 
+			const boards = response.data.boards;
+			const boardNames = boards.map( (board: any) => board.name);
+			//show quickpick
+			const selectedBoardName = await vscode.window.showQuickPick(boardNames);
+			//get id of selectedBoardName
+			vscode.window.showInformationMessage('Default board set to ' + selectedBoardName);
+			const selectedBoard = boards.find( (board: any) => board.name === selectedBoardName).id;
+			//add boardSelection to context
+			context.workspaceState.update('boardSelection', selectedBoard);
+			getItemsMonday(context, selectedBoard); 
+		} else {
+			vscode.window.showInformationMessage("Error retrieving boards");
+		}
 	});
 	context.subscriptions.push(disposableBoards);
 }
