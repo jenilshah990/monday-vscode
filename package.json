@@ -17,10 +17,21 @@
     "onCommand:monday-vscode.showBoards",
     "onCommand:monday-vscode.commentItems",
     "onCommand:monday-vscode.completeItem",
+    "onView:monday-vscode.exampleView",
     "onCommand:monday-vscode.createItem"
   ],
   "main": "./out/extension.js",
   "contributes": {
+  
+    "views": {
+      "explorer": [
+          {
+              "id": "exampleView",
+              "name": "exampleView"
+          }
+      ]
+    },
+    
     "commands": [
       {
         "command": "monday-vscode.helloWorld",
@@ -60,6 +71,11 @@
       {
         "command": "monday-vscode.createItem",
         "title": "Create Item",
+        "category": "Monday"
+      },
+      {
+        "command": "monday-vscode.exampleView",
+        "title": "example",
         "category": "Monday"
       }
     ]
