@@ -17,7 +17,7 @@
     "onCommand:monday-vscode.showBoards",
     "onCommand:monday-vscode.commentItems",
     "onCommand:monday-vscode.completeItem",
-    "onView:monday-vscode.exampleView",
+    "onCommand:monday-vscode.treeview",
     "onCommand:monday-vscode.createItem"
   ],
   "main": "./out/extension.js",
@@ -26,8 +26,8 @@
     "views": {
       "explorer": [
           {
-              "id": "exampleView",
-              "name": "exampleView"
+              "id": "treeview",
+              "name": "treeview"
           }
       ]
     },
@@ -74,8 +74,8 @@
         "category": "Monday"
       },
       {
-        "command": "monday-vscode.exampleView",
-        "title": "example",
+        "command": "monday-vscode.treeview",
+        "title": "Tree View Example",
         "category": "Monday"
       }
     ]

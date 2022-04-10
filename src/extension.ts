@@ -7,6 +7,7 @@ import axios from 'axios';
 import { parse } from 'url';
 import { session } from './SessionManager';
 import { SessionManager } from './SessionManager';
+import { TreeDataProvider } from './TreeViewer';
 
 const finishedRequestHTML = 
 	'<!DOCTYPE html> \
@@ -74,6 +75,13 @@ export async function activate(context: vscode.ExtensionContext) {
 	session.init(context, monday); 
 	login(context, session);
 	logout(context, session); 
+
+	let disposableCompleteItem = vscode.commands.registerCommand('monday-vscode.treeview', async () => {
+		console.log('Treeviewer Activation Called.')
+		vscode.window.registerTreeDataProvider('treeview', new TreeDataProvider());
+	});
+	context.subscriptions.push(disposableCompleteItem);
+
 	//execute login, showBoards, commentItems?
 }
 
@@ -156,7 +164,7 @@ function modifyItemStatus(context: vscode.ExtensionContext) {
       }`;
 	  const response = await monday.api(query, {variables: {"value": "{\"label\":\""+selectedStatus+"\"}"}});
 
-	   if(response.data != null) {
+	  if(response.data != null) {
 		vscode.window.showInformationMessage('Successfully updated item status');
 		console.log(response); 
 		} else {

@@ -42,11 +42,11 @@ export class TreeViewer {
 //stack overflow
 import * as vscode from 'vscode';
 
-export function activate(context: vscode.ExtensionContext) {
-  vscode.window.registerTreeDataProvider('exampleView', new TreeDataProvider());
-}
+// export function activate(context: vscode.ExtensionContext) {
+//   console.log('Activating Tree View'); 
+// }
 
-class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
+export class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
   onDidChangeTreeData?: vscode.Event<TreeItem|null|undefined>|undefined;
 
   data: TreeItem[];
