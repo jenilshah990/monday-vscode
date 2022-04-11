@@ -41,23 +41,43 @@ export class TreeViewer {
 
 //stack overflow
 import * as vscode from 'vscode';
+import { getAllBoard } from './extension'
 
 // export function activate(context: vscode.ExtensionContext) {
 //   console.log('Activating Tree View'); 
 // }
+
+export interface item {
+  name: string; 
+  id: string;
+  description: string;
+  items: number;
+}
+
+export interface board {
+  name: string; 
+  id: string;
+  description: string;
+  items: Array<item>;
+}
 
 export class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
   onDidChangeTreeData?: vscode.Event<TreeItem|null|undefined>|undefined;
 
   data: TreeItem[];
 
-  constructor() {
-    this.data = [new TreeItem('cars', [
-      new TreeItem(
-          'Ford', [new TreeItem('Fiesta'), new TreeItem('Focus'), new TreeItem('Mustang')]),
-      new TreeItem(
-          'BMW', [new TreeItem('320'), new TreeItem('X3'), new TreeItem('X5')])
-    ])];
+  constructor(context: vscode.ExtensionContext) {
+    getAllBoard(context)
+    const boards = context.workspaceState.get('boards') as Array<board>
+    console.log(boards)
+    // this.data = [new TreeItem('cars', [
+    //   new TreeItem(
+    //       'Ford', [new TreeItem('Fiesta'), new TreeItem('Focus'), new TreeItem('Mustang')]),
+    //   new TreeItem(
+    //       'BMW', [new TreeItem('320'), new TreeItem('X3'), new TreeItem('X5')])
+    // ])];
+
+    this.data = [new TreeItem(boards[0])];   
   }
 
   getTreeItem(element: TreeItem): vscode.TreeItem|Thenable<vscode.TreeItem> {
@@ -85,9 +105,9 @@ export class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 class TreeItem extends vscode.TreeItem {
   children: TreeItem[]|undefined;
 
-  constructor(label: string, children?: TreeItem[]) {
+  constructor(label: board, children?: TreeItem[]) {
     super(
-        label,
+        label.name,
         children === undefined ? vscode.TreeItemCollapsibleState.None :
                                  vscode.TreeItemCollapsibleState.Expanded);
     this.children = children;

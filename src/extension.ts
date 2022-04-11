@@ -78,7 +78,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	let disposableCompleteItem = vscode.commands.registerCommand('monday-vscode.treeview', async () => {
 		console.log('Treeviewer Activation Called.')
-		vscode.window.registerTreeDataProvider('treeview', new TreeDataProvider());
+		vscode.window.registerTreeDataProvider('treeview', new TreeDataProvider(context));
 	});
 	context.subscriptions.push(disposableCompleteItem);
 
@@ -201,6 +201,20 @@ function showDate(context: vscode.ExtensionContext) {
 		vscode.window.showInformationMessage('Current Date: ' + dateTime);
 	});
 	context.subscriptions.push(disposableDateTime);
+}
+
+export async function getAllBoard(context: vscode.ExtensionContext) {
+	console.log('Getting all boards.');
+	const response = await monday.api(allBoardsQuery);
+	console.log(response); 
+	if(response.data != null) {
+		vscode.window.showInformationMessage('Successfully retrieved boards');
+		console.log(response); 
+		const boards = response.data.boards;
+		const boardNames = boards.map( (board: any) => board.name);
+		context.workspaceState.update('boards', boards); 
+		context.workspaceState.update('boardNames', boardNames); 
+	}
 }
 
 function showBoards(context: vscode.ExtensionContext) {
