@@ -21,19 +21,19 @@ export class TreeViewer {
     async init(context: vscode.ExtensionContext, monday: any) {  
     }
 
-    public getSession(context: vscode.ExtensionContext): session | undefined {
+    public getItem(context: vscode.ExtensionContext): session | undefined {
     }
 
-    private isExpired(expirationDate: Number) {
+    public createItem(context: vscode.ExtensionContext): session | undefined {
     }
 
-    public setSession(context: vscode.ExtensionContext, session?: session): void {
+    private updateItemStatus(expirationDate: Number) {
     }
 
-    public logout(context: vscode.ExtensionContext){
+    public getItemStatus(context: vscode.ExtensionContext, session?: session): void {
     }
 
-    public isAuthenticated(context: vscode.ExtensionContext): boolean{
+    public setDefaultView(context: vscode.ExtensionContext, defaultBoard: board): session | undefined {
     }
 }
 
@@ -70,14 +70,10 @@ export class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
     getAllBoard(context)
     const boards = context.workspaceState.get('boards') as Array<board>
     console.log(boards)
-    // this.data = [new TreeItem('cars', [
-    //   new TreeItem(
-    //       'Ford', [new TreeItem('Fiesta'), new TreeItem('Focus'), new TreeItem('Mustang')]),
-    //   new TreeItem(
-    //       'BMW', [new TreeItem('320'), new TreeItem('X3'), new TreeItem('X5')])
-    // ])];
-
-    this.data = [new TreeItem(boards[0])];   
+    this.data = [];
+    boards.forEach(element => {
+      this.data.push(new TreeItem(element)); 
+    });
   }
 
   getTreeItem(element: TreeItem): vscode.TreeItem|Thenable<vscode.TreeItem> {
@@ -110,6 +106,6 @@ class TreeItem extends vscode.TreeItem {
         label.name,
         children === undefined ? vscode.TreeItemCollapsibleState.None :
                                  vscode.TreeItemCollapsibleState.Expanded);
-    this.children = children;
+    // this.children = children;
   }
 }
